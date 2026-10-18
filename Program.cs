@@ -9,17 +9,17 @@ class Program
             "Server=localhost,1433;Database=ParkingInfoSystem;User Id=sa;" +
             "Password=YourPassword;TrustServerCertificate=True;";
 
-        using (SqlConnection connection = new SqlConnection(connectionString))
+
+        try
         {
-            try
+            using (Db db = new Db(connectionString))
             {
-                connection.Open();
 
                 string sql = @"
                     SELECT SlotId, SlotNumber, SlotType, Status, HourlyRate
                     FROM dbo.ParkingSlots;";
 
-                SqlCommand query = new SqlCommand(sql, connection);
+                SqlCommand query = new SqlCommand(sql, db.Connection);
 
                 List<Parking> parkings = new();
 
@@ -46,10 +46,11 @@ class Program
                     );
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Connection failed: {ex.Message}");
-            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Connection failed: {ex.Message}");
         }
     }
+
 }
