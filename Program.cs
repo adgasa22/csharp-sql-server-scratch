@@ -1,4 +1,5 @@
 ﻿using System;
+using Dapper;
 using Microsoft.Data.SqlClient;
 
 class Program
@@ -21,22 +22,10 @@ class Program
 
                 SqlCommand query = new SqlCommand(sql, db.Connection);
 
-                List<Parking> parkings = new();
-
-                using (SqlDataReader reader = query.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        parkings.Add(new Parking
-                        {
-                            SlotId = reader.GetInt32(0),
-                            SlotNumber = reader.GetString(1),
-                            SlotType = reader.GetString(2),
-                            Status = reader.GetString(3),
-                            HourlyRate = reader.GetDecimal(4)
-                        });
-                    }
-                }
+                var parkings = db.Connection.Query<Parking>(
+                @"SELECT SlotId, SlotNumber, SlotType, Status, HourlyRate
+                  FROM dbo.ParkingSlots;"
+                ).ToList();
 
                 foreach (var p in parkings)
                 {
